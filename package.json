@@ -1,7 +1,7 @@
 {
-  "name": "network-cache",
+  "name": "xhr-cache",
   "version": "0.1.0",
-  "description": "a library that caches network requests to be reloaded at a later time for SPA's",
+  "description": "a library that caches network request responses to be loaded at a later time",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,7 +12,6 @@
   },
   "keywords": [
     "cache",
-    "spa",
     "network",
     "rest",
     "xhr"
