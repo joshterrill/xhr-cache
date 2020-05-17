@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .container {
+                max-width: 400px;
+                margin: auto;
+                text-align: center;
+            }
+            .url {
+                width: 100%;
+                padding: 4px;
+            }
+            .submit {
+                margin-top: 4px;
+            }
+            .results {
+                margin-top: 10px;
+                text-align: left;
+            }
+            pre {
+                white-space: initial;
+                line-break: anywhere;
+            }
+            .created-by {
+                position: fixed;
+                bottom: 10px;
+                right: 10px;
+            }
+        </style>
+        <script src="index.js"></script>
+        <script>
+            function submitUrl(event) {
+                event.preventDefault();
+                const res = xhrCache(document.querySelector(".url").value, {method: "GET"})
+                res.then(result => {
+                    const { url, data } = result;
+                    console.log(data);
+                    const el = document.querySelector(".results");
+                    el.innerHTML = `
+                    <strong>URL: ${url}</strong><br />
+                    <strong>Results:</strong><br />
+                    <pre>${JSON.stringify(data)}</pre>
+                    `
+                });
+                
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>XHR Cache Example</h1>
+            <p>Enter the URL of a GET call in the text box, the first call will be made and cached, and all other calls to the same URL with same method will be pulled from cache.</p>
+            <form onsubmit="submitUrl(event)">
+                <input class="url" type="text" placeholder="Enter GET URL Call Here" value="https://api.github.com/users/joshterrill/followers" /> <br />
+                <button class="submit" type="submit">Submit</button>
+            </form>
+            <div class="results"></div>
+        </div>
+        <div class="created-by">
+            Github: <a href="https://github.com/joshterrill" target="_blank">@joshterrill</a> <br />
+            Twitter: <a href="https://twitter.com/joshterrill" target="_blank">@joshterrill</a> <br />
+        </div>
+    </body>
+</html>

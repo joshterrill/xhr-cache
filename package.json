@@ -1,0 +1,26 @@
+{
+  "name": "network-cache",
+  "version": "0.1.0",
+  "description": "a library that caches network requests to be reloaded at a later time for SPA's",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshterrill/network-cache.git"
+  },
+  "keywords": [
+    "cache",
+    "spa",
+    "network",
+    "rest",
+    "xhr"
+  ],
+  "author": "Josh Terrill",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joshterrill/network-cache/issues"
+  },
+  "homepage": "https://github.com/joshterrill/network-cache#readme"
+}
