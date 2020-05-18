@@ -1,46 +1,45 @@
 const dbName = "xhr_cache_store";
-let db;
-
 function xhrCache(url, options) {
     return new Promise((resolve, reject) => {
+        options.method = options.method || "GET";
         checkCache(url, options).then(result => {
-            if (result) {
-                resolve(result);
-            } else {
-                fetch(url, options).then(res => {
-                    res.json().then(data => {
-                        resolve(data)
-                        console.log("going to cache data");
-                        cacheData(url, options, data);
-                    });
-                }).catch(err => reject(err));
-            }
+                if (result) {
+                    resolve(result);
+                } else {
+                    fetch(url, options).then(res => {
+                        res.json().then(data => {
+                            cacheData(url, options, data);
+                            resolve({data, url, method: options.method})
+                        });
+                    }).catch(err => reject(err));
+                }
+           
         });
     });
 
 }
 
-function cacheData(url, options, data) {
-    const request = indexedDB.open(dbName, 1);
-
-    request.onerror = function (event) {
-        console.error(event);
+function createStore(db) {
+    const objectStore = db.createObjectStore("requests", { keyPath: "urlMethod" });
+    console.log("creating object store", objectStore);
+    objectStore.onsuccess = function (event) {
+        console.info("Created object store");
     }
+}
 
-    request.onupgradeneeded = function(event) { 
-        console.log("upgrade needed");
-        db = event.target.result;
-        const objectStore = db.createObjectStore("requests", { keyPath: "urlMethod" });
-        objectStore.onsuccess = function (event) {
-            console.info("Created object store");
+function cacheData(url, options, data) {
+    const cacheRequest = indexedDB.open(dbName);
+    cacheRequest.onupgradeneeded = function(event) { 
+        const db = event.target.result;
+        if (!db.objectStoreNames.length || !db.objectStoreNames.contains("requests")) {
+            createStore(db);
         }
     };
 
-    request.onsuccess = function (event) {
-        console.log("onsuccess");
-        db = event.target.result;
+    cacheRequest.onsuccess = function (event) {
+        const db = event.target.result;
         const requestObjectStore = db.transaction(["requests"], "readwrite").objectStore("requests");
-        const method = options.method || "GET";
+        const method = options.method;
         const save = {
             urlMethod: `${url}:::${method}`,
             url,
@@ -48,27 +47,42 @@ function cacheData(url, options, data) {
             data,
         };
         requestObjectStore.add(save);
+        db.close();
     }
 }
 
 function checkCache(url, options) {
     return new Promise(resolve => {
-        const request = indexedDB.open(dbName, 1);
-        request.onsuccess = function (event) {
-            db = event.target.result;
-            try {
-                const requestObjectStore = db.transaction("requests", "readwrite").objectStore("requests");
-                const method = options.method || "GET";
-                const data = requestObjectStore.get(`${url}:::${method}`);
-                data.onsuccess = function (event) {
-                    if (event.target.result) {
-                        resolve(event.target.result);
-                    } else {
-                        resolve(null);
+        const checkCacheRequest = indexedDB.open(dbName);
+        checkCacheRequest.onupgradeneeded = function (event) {
+            const db = event.target.result;
+            if (!db.objectStoreNames.length || !db.objectStoreNames.contains("requests")) {
+                createStore(db);
+            }
+        }
+        checkCacheRequest.onsuccess = function (event) {
+            const db = event.target.result;
+            if (!db.objectStoreNames.length || !db.objectStoreNames.contains("requests")) {
+                db.close();
+                resolve(false);
+            } else {
+                try {
+                    const requestObjectStore = db.transaction(["requests"], "readwrite").objectStore("requests");
+                    const method = options.method;
+                    const data = requestObjectStore.get(`${url}:::${method}`);
+                    data.onsuccess = function (event) {
+                        if (event.target.result) {
+                            db.close();
+                            resolve(event.target.result);
+                        } else {
+                            db.close();
+                            resolve(false);
+                        }
                     }
+                } catch (error) {
+                    db.close();
+                    resolve(false);
                 }
-            } catch (error) {
-                resolve(null);
             }
         }
     });
