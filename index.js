@@ -1,4 +1,5 @@
 const dbName = "xhr_cache_store";
+const xhrBlacklist = [];
 function xhrCache(url, options) {
     return new Promise((resolve, reject) => {
         options.method = options.method || "GET";
@@ -17,6 +18,14 @@ function xhrCache(url, options) {
         });
     });
 
+}
+
+function createBlacklist(list = []) {
+    xhrBlacklist.push(...list);
+}
+
+function checkBlacklist(method, url) {
+    return xhrBlacklist.find(i => i[0] === method && i[1].test(url));
 }
 
 function createStore(db) {
@@ -54,40 +63,44 @@ function cacheData(url, options, data) {
 
 function checkCache(url, options) {
     return new Promise(resolve => {
-        const checkCacheRequest = indexedDB.open(dbName);
-        checkCacheRequest.onupgradeneeded = function (event) {
-            const db = event.target.result;
-            if (!db.objectStoreNames.length || !db.objectStoreNames.contains("requests")) {
-                createStore(db);
+        if (checkBlacklist(options.method, url)) {
+            resolve(false);
+        } else {
+            const checkCacheRequest = indexedDB.open(dbName);
+            checkCacheRequest.onupgradeneeded = function (event) {
+                const db = event.target.result;
+                if (!db.objectStoreNames.length || !db.objectStoreNames.contains("requests")) {
+                    createStore(db);
+                }
             }
-        }
-        checkCacheRequest.onsuccess = function (event) {
-            const db = event.target.result;
-            if (!db.objectStoreNames.length || !db.objectStoreNames.contains("requests")) {
-                db.close();
-                resolve(false);
-            } else {
-                try {
-                    const requestObjectStore = db.transaction(["requests"], "readwrite").objectStore("requests");
-                    const method = options.method;
-                    const key = `${url}:::${method}`;
-                    const data = requestObjectStore.get(key);
-                    data.onsuccess = function (event) {
-                        const record = event.target.result;
-                        if (record && record.expires >= new Date().getTime()) {
+            checkCacheRequest.onsuccess = function (event) {
+                const db = event.target.result;
+                if (!db.objectStoreNames.length || !db.objectStoreNames.contains("requests")) {
+                    db.close();
+                    resolve(false);
+                } else {
+                    try {
+                        const requestObjectStore = db.transaction(["requests"], "readwrite").objectStore("requests");
+                        const method = options.method;
+                        const key = `${url}:::${method}`;
+                        const data = requestObjectStore.get(key);
+                        data.onsuccess = function (event) {
+                            const record = event.target.result;
+                            if (record && record.expires >= new Date().getTime()) {
+                                db.close();
+                                resolve(record);
+                            } else if (record) {
+                                requestObjectStore.delete(key)
+                            }
                             db.close();
-                            resolve(record);
-                        } else if (record) {
-                            requestObjectStore.delete(key)
+                            resolve(false);
                         }
+                    } catch (error) {
                         db.close();
                         resolve(false);
                     }
-                } catch (error) {
-                    db.close();
-                    resolve(false);
                 }
-            }
+            }     
         }
     });
 }

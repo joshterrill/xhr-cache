@@ -7,13 +7,17 @@ Note: **This is functional, but still a work in progress.**
 ### Usage
 
 ```javascript
+// blacklists to never cache URL's can be added via regex patterns, then call createBlacklist() and pass it in
+const blacklist = [["GET", /github/g]];
+createBlackList(blacklist)
+
 const res = xhrCache("http://someurl.com/here", {method: "GET", ttl: 5000})
 res.then(data => console.log(data));
 ```
 
 ### Features Needed
 
-* Implement blacklist and whitelist
+* Implement blacklist and whitelist (Still issue with true vs undefined returns every other time checked)
 
 ### License
 

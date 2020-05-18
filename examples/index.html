@@ -30,12 +30,13 @@
         </style>
         <script src="../index.js"></script>
         <script>
+            // createBlacklist([["GET", /github/g]]);
             function submitUrl(event) {
                 event.preventDefault();
                 const res = xhrCache(document.querySelector(".url").value, {method: "GET", ttl: 5000})
                 res.then(result => {
                     const { url, data } = result;
-                    console.log(data);
+                    // console.log(data);
                     const el = document.querySelector(".results");
                     el.innerHTML = `
                     <strong>URL: ${url}</strong><br />
