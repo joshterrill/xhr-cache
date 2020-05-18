@@ -7,7 +7,7 @@ A wrapper around `fetch()` that caches the results from your network calls. If y
 Include in HTML:
 
 ```html
-<script src="https://unpkg.com/xhr-cache@1.0.0/index.js"></script>
+<script src="https://unpkg.com/xhr-cache@1.0.1/index.js"></script>
 ```
 
 Then somewhere in javascript...
@@ -17,6 +17,7 @@ Then somewhere in javascript...
 const blacklist = [["GET", /github/g]];
 createBlackList(blacklist)
 
+// if no ttl is set, it never expires
 const res = xhrCache("http://someurl.com/here", {method: "GET", ttl: 5000})
 res.then(data => console.log(data));
 ```
@@ -24,6 +25,8 @@ res.then(data => console.log(data));
 ### Still being worked on
 
 * Making this a module so it can be `import`ed and pulled in using `require`.
+* Add option for setting global headers
+* Add option for clearing cache
 
 ### License
 
