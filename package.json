@@ -1,6 +1,6 @@
 {
   "name": "xhr-cache",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "a library that caches network request responses to be loaded at a later time",
   "main": "index.js",
   "scripts": {

@@ -9,7 +9,7 @@ A wrapper around `fetch()` that caches the results from your network calls. If y
 Include in HTML:
 
 ```html
-<script src="https://unpkg.com/xhr-cache@1.0.1/index.js"></script>
+<script src="https://unpkg.com/xhr-cache@latest/index.js"></script>
 ```
 
 Then somewhere in javascript...
