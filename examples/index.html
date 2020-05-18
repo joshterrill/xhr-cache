@@ -28,12 +28,12 @@
                 right: 10px;
             }
         </style>
-        <script src="https://unpkg.com/xhr-cache@1.0.0/index.js"></script>
+        <script src="https://unpkg.com/xhr-cache@1.0.2/index.js"></script>
         <script>
             // createBlacklist([["GET", /github/g]]);
             function submitUrl(event) {
                 event.preventDefault();
-                const res = xhrCache(document.querySelector(".url").value, {method: "GET", ttl: 5000})
+                const res = xhrCache(document.querySelector(".url").value, {method: "GET", ttl: 60000})
                 res.then(result => {
                     const { url, data } = result;
                     // console.log(data);

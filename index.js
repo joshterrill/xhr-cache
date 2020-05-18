@@ -48,7 +48,7 @@ function cacheData(url, options, data) {
         const db = event.target.result;
         const requestObjectStore = db.transaction(["requests"], "readwrite").objectStore("requests");
         const { method, ttl } = options;
-        let expires = undefined;
+        let expires = 0;
         if (ttl) {
             expires = new Date().getTime() + ttl;
         }
@@ -91,6 +91,8 @@ function checkCache(url, options) {
                             const record = event.target.result;
                             if (record && record.expires && record.expires >= new Date().getTime()) {
                                 db.close();
+                                resolve(record);
+                            } else if (record && !record.expires) {
                                 resolve(record);
                             } else if (record) {
                                 requestObjectStore.delete(key)
