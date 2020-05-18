@@ -21,9 +21,8 @@ function xhrCache(url, options) {
 
 function createStore(db) {
     const objectStore = db.createObjectStore("requests", { keyPath: "urlMethod" });
-    console.log("creating object store", objectStore);
     objectStore.onsuccess = function (event) {
-        console.info("Created object store");
+        console.info("XHRCache Created Store");
     }
 }
 
@@ -39,11 +38,13 @@ function cacheData(url, options, data) {
     cacheRequest.onsuccess = function (event) {
         const db = event.target.result;
         const requestObjectStore = db.transaction(["requests"], "readwrite").objectStore("requests");
-        const method = options.method;
+        const { method, ttl } = options;
+        const expires = new Date().getTime() + ttl;
         const save = {
             urlMethod: `${url}:::${method}`,
             url,
             method,
+            expires,
             data,
         };
         requestObjectStore.add(save);
@@ -69,15 +70,18 @@ function checkCache(url, options) {
                 try {
                     const requestObjectStore = db.transaction(["requests"], "readwrite").objectStore("requests");
                     const method = options.method;
-                    const data = requestObjectStore.get(`${url}:::${method}`);
+                    const key = `${url}:::${method}`;
+                    const data = requestObjectStore.get(key);
                     data.onsuccess = function (event) {
-                        if (event.target.result) {
+                        const record = event.target.result;
+                        if (record && record.expires >= new Date().getTime()) {
                             db.close();
-                            resolve(event.target.result);
-                        } else {
-                            db.close();
-                            resolve(false);
+                            resolve(record);
+                        } else if (record) {
+                            requestObjectStore.delete(key)
                         }
+                        db.close();
+                        resolve(false);
                     }
                 } catch (error) {
                     db.close();

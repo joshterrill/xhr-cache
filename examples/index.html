@@ -32,7 +32,7 @@
         <script>
             function submitUrl(event) {
                 event.preventDefault();
-                const res = xhrCache(document.querySelector(".url").value, {method: "GET"})
+                const res = xhrCache(document.querySelector(".url").value, {method: "GET", ttl: 5000})
                 res.then(result => {
                     const { url, data } = result;
                     console.log(data);
