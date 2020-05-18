@@ -25,7 +25,7 @@ function createBlacklist(list = []) {
 }
 
 function checkBlacklist(method, url) {
-    return xhrBlacklist.find(i => i[0] === method && i[1].test(url));
+    return xhrBlacklist.find(i => i[0] === method && url.match(i[1]));
 }
 
 function createStore(db) {

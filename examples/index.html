@@ -33,7 +33,7 @@
             // createBlacklist([["GET", /github/g]]);
             function submitUrl(event) {
                 event.preventDefault();
-                const res = xhrCache(document.querySelector(".url").value, {method: "GET", ttl: 5000})
+                const res = xhrCache(document.querySelector(".url").value, {method: "GET", ttl: 60000})
                 res.then(result => {
                     const { url, data } = result;
                     // console.log(data);
