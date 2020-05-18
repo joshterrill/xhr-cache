@@ -1,6 +1,6 @@
 {
   "name": "xhr-cache",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "a library that caches network request responses to be loaded at a later time",
   "main": "index.js",
   "scripts": {
@@ -8,18 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joshterrill/network-cache.git"
+    "url": "git+https://github.com/joshterrill/xhr-cache.git"
   },
   "keywords": [
     "cache",
     "network",
     "rest",
-    "xhr"
+    "xhr",
+    "caching"
   ],
   "author": "Josh Terrill",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/joshterrill/network-cache/issues"
+    "url": "https://github.com/joshterrill/xhr-cache/issues"
   },
-  "homepage": "https://github.com/joshterrill/network-cache#readme"
+  "homepage": "https://github.com/joshterrill/xhr-cache#readme"
 }
